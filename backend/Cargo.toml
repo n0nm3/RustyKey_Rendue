@@ -1,0 +1,36 @@
+[package]
+name = "rustykey-backend"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+common = { path = "../common" }
+anyhow = "1.0"
+tokio = { version = "1", features = ["full"] }
+axum = { version = "0.8", features = ["macros"] }
+axum-extra = { version = "0.10", features = ["typed-header"] }
+async-trait = "0.1"  # Pour les extracteurs async
+tower = "0.5"
+tower-http = { version = "0.6", features = ["trace"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+uuid = { version = "1", features = ["serde", "v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+md5 = "0.8"
+sha2 = "0.10"
+regex = "1.11"
+bytes = "1.10"
+env_logger = "0.11"
+bincode = "2.0"
+axum-server = { version = "0.7", features = ["tls-rustls"] }
+rustls = { version = "0.23", features = ["ring"] }
+rustls-pemfile = "2.0"
+tokio-rustls = "0.26"
+reqwest = { version = "0.12", features = ["json", "multipart","rustls-tls-manual-roots"], default-features = false }
+x509-parser = "0.17"
+webpki = { version = "0.22", features = ["alloc"] }
+aes-gcm = "0.10"
+rand = "0.9"
+rand_core = "0.9"
+base64 = "0.22"
+nix = "0.30"

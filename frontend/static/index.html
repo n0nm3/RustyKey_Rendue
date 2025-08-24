@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RustyKey Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🦀 RustyKey Dashboard</h1>
+            <p>Zero Trust USB Management Interface</p>
+        </header>
+
+        <div class="config-section">
+            <h2>Configuration</h2>
+            <div class="input-group">
+                <label for="userId">User ID (UUID):</label>
+                <input type="text" id="userId" placeholder="8fad2ca1-56a9-4ebf-b9d2-b1ca8af37ad2">
+                <button onclick="saveUserId()">Save</button>
+            </div>
+            <div class="input-group">
+                <label for="bucketId">Bucket ID (UUID):</label>
+                <input type="text" id="bucketId" placeholder="6a302045-5c8e-42c0-9311-c4a280275c89">
+            </div>
+        </div>
+
+        <div class="actions-section">
+            <h2>S3 Operations</h2>
+            <div class="button-grid">
+                <button class="btn btn-primary" onclick="listBuckets()">📦 List Buckets</button>
+                <button class="btn btn-primary" onclick="listObjects()">📄 List Objects</button>
+                <button class="btn btn-success" onclick="showUploadObject()">⬆️ Upload Object</button> <!-- AJOUTER -->
+                <button class="btn btn-info" onclick="showGetObject()">⬇️ Get Object</button>
+                <button class="btn btn-danger" onclick="showDeleteObject()">🗑️ Delete Object</button>
+            </div>
+        </div>
+
+        <!-- NOUVELLE SECTION COMPLÈTE POUR LA GESTION DES UTILISATEURS -->
+        <div class="actions-section">
+            <h2>👥 User Management (Admin Only)</h2>
+            
+            <!-- Sous-section pour les utilisateurs -->
+            <div class="subsection">
+                <h3>Users</h3>
+                <div class="button-grid-small">
+                    <button class="btn btn-warning" onclick="listAllUsers()">📋 List All Users</button>
+                    <button class="btn btn-success" onclick="showCreateUser()">➕ Create User</button>
+                    <button class="btn btn-danger" onclick="showDeleteUser()">🗑️ Delete User</button>
+                </div>
+            </div>
+
+            <!-- Sous-section pour les permissions -->
+            <div class="subsection">
+                <h3>Permissions</h3>
+                <div class="button-grid-small">
+                    <button class="btn btn-warning" onclick="showUserPermissions()">🔐 View User Permissions</button>
+                    <button class="btn btn-success" onclick="showGrantPermission()">✅ Grant Permission</button>
+                    <button class="btn btn-danger" onclick="showRevokePermission()">❌ Revoke Permission</button>
+                </div>
+            </div>
+
+            <!-- Sous-section pour les agents -->
+            <div class="subsection">
+                <h3>Agents</h3>
+                <div class="button-grid-small">
+                    <button class="btn btn-warning" onclick="listAgents()">🤖 List Connected Agents</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section pour créer un utilisateur -->
+        <div id="createUserSection" class="object-actions" style="display: none;">
+            <h3>Create New User</h3>
+            <div class="input-group">
+                <label for="newUserName">Username:</label>
+                <input type="text" id="newUserName" placeholder="john_doe">
+            </div>
+            <div class="permission-checkboxes">
+                <label><input type="checkbox" id="newUserIsAdmin"> Admin User</label>
+            </div>
+            <button onclick="createUser()" class="btn btn-success">Create User</button>
+        </div>
+
+        <!-- Section pour supprimer un utilisateur -->
+        <div id="deleteUserSection" class="object-actions" style="display: none;">
+            <h3>Delete User</h3>
+            <div class="input-group">
+                <label for="deleteUserId">User ID:</label>
+                <input type="text" id="deleteUserId" placeholder="User UUID to delete">
+                <button onclick="deleteUser()" class="btn btn-danger">Delete User</button>
+            </div>
+        </div>
+
+        <!-- Section pour voir les permissions d'un utilisateur -->
+        <div id="viewPermissionsSection" class="object-actions" style="display: none;">
+            <h3>View User Permissions</h3>
+            <div class="input-group">
+                <label for="viewPermUserId">User ID:</label>
+                <input type="text" id="viewPermUserId" placeholder="User UUID">
+                <button onclick="viewUserPermissions()" class="btn btn-warning">View Permissions</button>
+            </div>
+        </div>
+
+        <!-- Section pour accorder des permissions -->
+        <div id="grantPermissionSection" class="object-actions" style="display: none;">
+            <h3>Grant Permissions to User</h3>
+            <div class="input-group">
+                <label for="grantUserId">User ID:</label>
+                <input type="text" id="grantUserId" placeholder="User UUID">
+            </div>
+            <div class="input-group">
+                <label for="grantBucketId">Bucket ID:</label>
+                <input type="text" id="grantBucketId" placeholder="Bucket UUID">
+            </div>
+            <div class="permission-checkboxes">
+                <label><input type="checkbox" id="grantRead" checked> Read</label>
+                <label><input type="checkbox" id="grantWrite"> Write</label>
+                <label><input type="checkbox" id="grantDelete"> Delete</label>
+            </div>
+            <button onclick="grantPermission()" class="btn btn-success">Grant Permissions</button>
+        </div>
+
+        <!-- Section pour révoquer des permissions -->
+        <div id="revokePermissionSection" class="object-actions" style="display: none;">
+            <h3>Revoke User Permissions</h3>
+            <div class="input-group">
+                <label for="revokeUserId">User ID:</label>
+                <input type="text" id="revokeUserId" placeholder="User UUID">
+            </div>
+            <div class="input-group">
+                <label for="revokeBucketId">Bucket ID:</label>
+                <input type="text" id="revokeBucketId" placeholder="Bucket UUID">
+            </div>
+            <button onclick="revokePermission()" class="btn btn-danger">Revoke All Permissions</button>
+        </div>
+
+        <div class="actions-section">
+            <h2>Security Policy</h2>
+            <div class="button-grid">
+                <button class="btn btn-security" onclick="listBannedExtensions()">🚫 List Banned Extensions</button>
+                <button class="btn btn-security" onclick="showAddExtension()">➕ Ban Extension</button>
+                <button class="btn btn-security" onclick="showRemoveExtension()">➖ Unban Extension</button>
+                <button class="btn btn-warning" onclick="cleanAllBuckets()">🧹 Clean All Buckets</button>
+            </div>
+        </div>
+
+        <!-- Sections existantes pour les objets et extensions... -->
+        <div id="objectActions" class="object-actions" style="display: none;">
+            <h3>Object Operations</h3>
+            <div class="input-group">
+                <label for="objectKey">Object Key/Path:</label>
+                <input type="text" id="objectKey" placeholder="documents/file.txt">
+                <button id="actionButton" class="btn">Execute</button>
+            </div>
+        </div>
+
+        <div id="addExtensionSection" class="object-actions" style="display: none;">
+            <h3>Ban File Extension</h3>
+            <div class="input-group">
+                <label for="newExtension">Extension:</label>
+                <input type="text" id="newExtension" placeholder=".exe or exe">
+                <button onclick="addBannedExtension()" class="btn btn-security">Ban Extension</button>
+            </div>
+            <div class="info-box">
+                <p>Examples: .exe, .bat, .cmd, .scr, .dll</p>
+                <p>Extension will be checked anywhere in filename (handles double extensions)</p>
+            </div>
+        </div>
+
+        <div id="removeExtensionSection" class="object-actions" style="display: none;">
+            <h3>Unban File Extension</h3>
+            <div class="input-group">
+                <label for="extensionToRemove">Extension:</label>
+                <input type="text" id="extensionToRemove" placeholder=".exe or exe">
+                <button onclick="removeBannedExtension()" class="btn btn-security">Unban Extension</button>
+            </div>
+        </div>
+        <div class="actions-section">
+            <h2>🛡️ VirusTotal Security Scanning</h2>
+            <div class="button-grid">
+                <button class="btn btn-virustotal" onclick="showCheckHash()">🔍 Check File Hash</button>
+                <button class="btn btn-virustotal" onclick="showCheckObject()">📄 Scan Bucket Object</button>
+            </div>
+        </div>
+        
+        <!-- Section pour vérifier un hash -->
+        <div id="checkHashSection" class="object-actions" style="display: none;">
+            <h3>Check File Hash with VirusTotal</h3>
+            <div class="input-group">
+                <label for="hashToCheck">File Hash (SHA256/MD5):</label>
+                <input type="text" id="hashToCheck" placeholder="275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f">
+                <button onclick="checkFileHash()" class="btn btn-virustotal">Check Hash</button>
+            </div>
+            <div class="info-box">
+                <p>Enter a SHA256, SHA1, or MD5 hash to check against VirusTotal's database</p>
+                <p>Example (EICAR test): 275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f</p>
+            </div>
+        </div>
+        
+        <!-- Section pour scanner un objet du bucket -->
+        <div id="checkObjectSection" class="object-actions" style="display: none;">
+            <h3>Scan Object from Bucket</h3>
+            <div class="input-group">
+                <label for="objectToScan">Object Path:</label>
+                <input type="text" id="objectToScan" placeholder="documents/file.exe">
+                <button onclick="checkBucketObject()" class="btn btn-virustotal">Scan Object</button>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <h2>Results</h2>
+            <div class="results-header">
+                <span id="resultStatus"></span>
+                <button onclick="clearResults()" class="btn-small">Clear</button>
+            </div>
+            <div id="results" class="results-container">
+                <p class="placeholder">Results will appear here...</p>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

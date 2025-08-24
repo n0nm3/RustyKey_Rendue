@@ -1,0 +1,6 @@
+[workspace]
+members = ["common", "agent", "backend", "frontend"]
+resolver = "2"
+
+[profile.dev]
+opt-level = 1 
