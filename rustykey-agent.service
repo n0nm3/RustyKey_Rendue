@@ -1,0 +1,15 @@
+[Unit]
+Before=udisks2.service
+After=systemd-udevd.service
+Conflicts=udisks2.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/rustykey-agent
+Restart=always
+RestartSec=3
+User=root 
+WorkingDirectory=/etc/rustykey
+
+[Install]
+WantedBy=multi-user.target
